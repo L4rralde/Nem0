@@ -1,0 +1,1 @@
+Distintos dispositivos prrogramables seran usados para emular algunos circuitos. Los dispositivos son comandados por una raspberrypi con un servidor web para monitoriar las variables del entorno simulado (presiòn, temperatura, elevaciòn, etc). 
