@@ -1,0 +1,1 @@
+Se desarrolla un sistema de simulaciòn con distintos microcontroladores que emulan sensores, gps y transceptores.Se monitorean las variables del entorno simulado con un microservicio montado en una raspberrypi. La raspberrypi tambièn controla las variables del entorno. 
