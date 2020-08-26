@@ -1,0 +1,107 @@
+#include<htc.h>
+
+__CONFIG(FOSC_INTRC_NOCLKOUT & WDTE_OFF & PWRTE_OFF & MCLRE_OFF & CP_OFF & BOREN_OFF & IESO_OFF & FCMEN_OFF & LVP_OFF& DEBUG_OFF);
+__CONFIG(BOR4V_BOR40V & WRT_OFF);
+
+void pause( unsigned int msvalue );		
+void msecbase( void );	
+
+
+	main() {
+
+		int envia32 = 0x21293412;
+		int recibe32, aux24;
+		unsigned short aux16;
+		unsigned char datotA0, datotA1, datotA2, datotA3, datotBasura, datorBasura,datorA0,datorA1,datorA2,datorA3;
+		datotA0 = envia32;
+		datotA1 = envia32 >> 8;
+		aux24 = envia32 >> 8;
+		aux16 = aux24 >> 8;
+		datotA2 = aux16;
+		datotA3 = aux16 >> 8;
+		datotBasura = 0x33;
+			
+		ANSELH = 0x00; 
+		ANSEL = 0x00;   
+		OSCCON = 0x40;	//Oscilador interno modificado a 1MHz.
+		TRISA = 0x00;	//Todos los puertos configurados como salida	 	
+		TRISB = 0x00;
+		TRISD = 0x00;
+		TRISE = 0x00;
+
+	//Inicialización del puerto SPI
+
+		SSPSTATbits.SMP = 0; //(sampled at middle of data)
+		SSPSTATbits.CKE = 0; //(falling edge, SS optional)
+		SSPCON = 0x20;	//MASTER MODE; FOSC/4; CKP=0 (idle state is a low level); SSPEN=1(serial port enabled)
+		TRISC = 0x10; //SDO=0,SCK=0, SDI=1 (Servidor)
+		PIE1 = 0x00; //INTERRUPCIÓN DEL SPI INHABILITADA. SPI LISTO
+				
+ 	//cOMIENZA TRANSMISIÓN DE DATOS	
+		SSPBUF = datotA0;
+		
+		pause(1);
+
+		while(!BF);
+		datorBasura =SSPBUF;
+
+		SSPBUF = datotA1;
+		
+		pause(1);
+
+		while(!BF);
+		datorA0 =SSPBUF;
+
+		SSPBUF = datotA2;
+		
+		pause(1);
+
+		while(!BF);
+		datorA1 =SSPBUF;
+
+		SSPBUF = datotA3;
+		
+		pause(1);
+
+		while(!BF);
+		datorA2 =SSPBUF;
+
+		SSPBUF = datotBasura;
+		
+		pause(1);
+
+		while(!BF);
+		datorA3 =SSPBUF;
+		
+		SSPCONbits.SSPEN = 0; //SSPEN = 0
+	
+
+	aux16 = (unsigned short)((datorA1 << 8) | datorA0); //parte baja del int reconstruida
+	aux24 = (int)((datorA3 << 8) | datorA2);
+	aux24 = aux24 << 8;
+	aux24 = aux24 << 8; //parte alta del int reconstruida
+	recibe32 = aux24 | aux16; //Todo el entero recibido reconstruído
+		
+		while(1) { 
+
+			PORTA = datorA0;	
+			PORTB = datorA1;
+			PORTD = datorA2;
+		}
+	}
+
+
+	void msecbase(void) { 
+  		OPTION_REG = 0b11010001;
+  		TMR0 = 0x0F;
+  		while(!T0IF);
+  		T0IF = 0;
+	}
+
+	void pause(unsigned int msvalue) {
+  		unsigned int x;
+ 
+		for (x=0; x<msvalue; x++) {
+	 		msecbase();
+ 		}
+	} 
