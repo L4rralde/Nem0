@@ -12,8 +12,8 @@ t0 = 0
 
 @app.route('/')
 def inicio():
-	#return '<p>Bienvenido</p><p><a href="htpp://raspberrypi.local:5000/monitor">Monitor</a></p>'
-	return '<p>Bienvenido</p><p><a href="htpp://localhost:5000/monitor">Monitor</a></p>'
+	return '<p>Bienvenido</p><p><a href="http://raspberrypi.local:5000/monitor">Monitor</a></p>'
+	#return '<p>Bienvenido</p><p><a href="http://localhost:5000/monitor">Monitor</a></p>'
 @app.route('/monitor')
 def main():
 	global t0
